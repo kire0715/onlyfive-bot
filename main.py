@@ -34,19 +34,19 @@ def get_stats():
         total_posts = None
         consecutive_days = None
 
-        # ページ内のすべての h4 タグ（項目名）を探す
-        for h4 in soup.find_all("h4"):
-            text = h4.text.strip()
+        # class="title" を持つ h3 タグを全検索
+        for h3 in soup.find_all("h3", class_="title"):
+            text = h3.text.strip()
             if text == "総投稿数":
-                # 「総投稿数」の直後にある h2 タグを取得
-                next_h2 = h4.find_next("h2")
-                if next_h2:
-                    total_posts = next_h2.text.strip()
+                # 直後にある h1.count を取得
+                next_h1 = h3.find_next("h1", class_="count")
+                if next_h1:
+                    total_posts = next_h1.text.strip()
             elif text == "連続投稿日数":
-                # 「連続投稿日数」の直後にある h2 タグを取得
-                next_h2 = h4.find_next("h2")
-                if next_h2:
-                    consecutive_days = next_h2.text.strip()
+                # 直後にある h1.count を取得
+                next_h1 = h3.find_next("h1", class_="count")
+                if next_h1:
+                    consecutive_days = next_h1.text.strip()
 
         if total_posts and consecutive_days:
             return total_posts, consecutive_days
