@@ -1,0 +1,72 @@
+import os
+import time
+import threading
+import requests
+from bs4 import BeautifulSoup
+from flask import Flask
+
+# --- 設定 ---
+URL = "https://only-five.jp/creators/4635"
+DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1536352899381329991/LBZRn7xNlLDLJDbJRjvskfGxANm9_xmMcWvTNFCEf80ethiX_SxT8ypjjzqVom-2AbUT"
+
+# クラウド上で常時稼働させるためのWebサーバー枠組み (Flask)
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Bot is running!"
+
+def send_discord_notification(message):
+    payload = {"content": message}
+    try:
+        requests.post(DISCORD_WEBHOOK_URL, json=payload)
+    except Exception as e:
+        print(f"Discord送信エラー: {e}")
+
+def get_stats():
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    }
+    response = requests.get(URL, headers=headers)
+    soup = BeautifulSoup(response.text, "html.parser")
+    
+    h2_tags = soup.find_all("h2")
+    if len(h2_tags) >= 2:
+        total_posts = h2_tags[0].text.strip()
+        consecutive_days = h2_tags[1].text.strip()
+        return total_posts, consecutive_days
+    return None, None
+
+def monitor():
+    last_total, last_consecutive = get_stats()
+    print(f"監視開始 - 総投稿数: {last_total}, 連続投稿日数: {last_consecutive}")
+
+    while True:
+        time.sleep(300) # 5分ごと
+        try:
+            current_total, current_consecutive = get_stats()
+            if current_total is None:
+                continue
+                
+            if current_total != last_total or current_consecutive != last_consecutive:
+                msg = (
+                    f"【ONLY FIVE 更新通知】\n"
+                    f"石浜もも さんの投稿データに変化がありました！\n\n"
+                    f"■ 総投稿数: {last_total} → {current_total}\n"
+                    f"■ 連続投稿日数: {last_consecutive} → {current_consecutive}\n"
+                    f"URL: {URL}"
+                )
+                print(msg)
+                send_discord_notification(msg)
+                
+                last_total = current_total
+                last_consecutive = current_consecutive
+        except Exception as e:
+            print(f"エラー発生: {e}")
+
+# バックグラウンドで監視処理を起動
+threading.Thread(target=monitor, daemon=True).start()
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
