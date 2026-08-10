@@ -25,18 +25,28 @@ def send_discord_notification(message):
 
 def get_stats():
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
-    response = requests.get(URL, headers=headers)
-    soup = BeautifulSoup(response.text, "html.parser")
-    
-    h2_tags = soup.find_all("h2")
-    if len(h2_tags) >= 2:
-        total_posts = h2_tags[0].text.strip()
-        consecutive_days = h2_tags[1].text.strip()
-        return total_posts, consecutive_days
+    try:
+        response = requests.get(URL, headers=headers, timeout=10)
+        soup = BeautifulSoup(response.text, "html.parser")
+        
+        # h2 タグから数字を含むテキストをすべて抽出
+        h2_tags = soup.find_all("h2")
+        
+        if len(h2_tags) >= 2:
+            # 余分な空白や改行を除去
+            total_posts = h2_tags[0].text.strip()
+            consecutive_days = h2_tags[1].text.strip()
+            
+            # 取得した値が空でないか確認
+            if total_posts and consecutive_days:
+                return total_posts, consecutive_days
+                
+    except Exception as e:
+        print(f"データ取得エラー: {e}")
+        
     return None, None
-
 def monitor():
     last_total, last_consecutive = get_stats()
     print(f"監視開始 - 総投稿数: {last_total}, 連続投稿日数: {last_consecutive}")
