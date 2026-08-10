@@ -60,7 +60,7 @@ def monitor():
     print(f"監視開始 - 総投稿数: {last_total}, 連続投稿日数: {last_consecutive}")
 
     while True:
-        time.sleep(300) # 5分ごと
+        time.sleep(180) # 3分ごと
         try:
             current_total, current_consecutive = get_stats()
             if current_total is None:
