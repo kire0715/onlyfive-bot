@@ -31,18 +31,26 @@ def get_stats():
         response = requests.get(URL, headers=headers, timeout=10)
         soup = BeautifulSoup(response.text, "html.parser")
         
-        # h2 タグから数字を含むテキストをすべて抽出
-        h2_tags = soup.find_all("h2")
-        
-        if len(h2_tags) >= 2:
-            # 余分な空白や改行を除去
-            total_posts = h2_tags[0].text.strip()
-            consecutive_days = h2_tags[1].text.strip()
-            
-            # 取得した値が空でないか確認
-            if total_posts and consecutive_days:
-                return total_posts, consecutive_days
-                
+        total_posts = None
+        consecutive_days = None
+
+        # ページ内のすべての h4 タグ（項目名）を探す
+        for h4 in soup.find_all("h4"):
+            text = h4.text.strip()
+            if text == "総投稿数":
+                # 「総投稿数」の直後にある h2 タグを取得
+                next_h2 = h4.find_next("h2")
+                if next_h2:
+                    total_posts = next_h2.text.strip()
+            elif text == "連続投稿日数":
+                # 「連続投稿日数」の直後にある h2 タグを取得
+                next_h2 = h4.find_next("h2")
+                if next_h2:
+                    consecutive_days = next_h2.text.strip()
+
+        if total_posts and consecutive_days:
+            return total_posts, consecutive_days
+
     except Exception as e:
         print(f"データ取得エラー: {e}")
         
