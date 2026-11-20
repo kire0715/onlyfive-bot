@@ -19,7 +19,8 @@ def home():
 def send_discord_notification(message):
     payload = {"content": message}
     try:
-        requests.post(DISCORD_WEBHOOK_URL, json=payload)
+        res = requests.post(DISCORD_WEBHOOK_URL, json=payload, timeout=10)
+        print(f"Discord送信結果: status={res.status_code}, body={res.text}")
     except Exception as e:
         print(f"Discord送信エラー: {e}")
 
