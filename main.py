@@ -7,7 +7,7 @@ from flask import Flask
 
 # --- 設定 ---
 URL = "https://only-five.jp/creators/4635"
-DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1536352899381329991/LBZRn7xNlLDLJDbJRjvskfGxANm9_xmMcWvTNFCEf80ethiX_SxT8ypjjzqVom-2AbUT"
+DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1573318677732917291/6Xojk8I5E_p1kk5qunl3QzyyOqo4ghRC4vFXWE1PF-V6977Mbvd6pnslEacdwfYClxf6"
 
 # クラウド上で常時稼働させるためのWebサーバー枠組み (Flask)
 app = Flask(__name__)
