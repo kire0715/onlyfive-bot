@@ -18,11 +18,20 @@ def home():
 
 def send_discord_notification(message):
     payload = {"content": message}
-    try:
-        res = requests.post(DISCORD_WEBHOOK_URL, json=payload, timeout=10)
-        print(f"Discord送信結果: status={res.status_code}, body={res.text}")
-    except Exception as e:
-        print(f"Discord送信エラー: {e}")
+    for attempt in range(3):
+        try:
+            res = requests.post(DISCORD_WEBHOOK_URL, json=payload, timeout=10)
+            print(f"Discord送信結果: status={res.status_code}, body={res.text[:200]}")
+            if res.status_code in (200, 204):
+                return
+            if res.status_code == 429:
+                retry_after = float(res.headers.get("Retry-After", 5))
+                time.sleep(min(retry_after, 30))
+                continue
+            return
+        except Exception as e:
+            print(f"Discord送信エラー: {e}")
+            return
 
 def get_stats():
     headers = {
@@ -89,3 +98,4 @@ threading.Thread(target=monitor, daemon=True).start()
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
