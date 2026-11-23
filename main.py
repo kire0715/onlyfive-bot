@@ -7,7 +7,7 @@ from flask import Flask
 
 # --- 設定 ---
 URL = "https://only-five.jp/creators/4635"
-DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1573318677732917291/6Xojk8I5E_p1kk5qunl3QzyyOqo4ghRC4vFXWE1PF-V6977Mbvd6pnslEacdwfYClxf6"
+DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1536352899381329991/LBZRn7xNlLDLJDbJRjvskfGxANm9_xmMcWvTNFCEf80ethiX_SxT8ypjjzqVom-2AbUT"
 
 # クラウド上で常時稼働させるためのWebサーバー枠組み (Flask)
 app = Flask(__name__)
@@ -98,4 +98,5 @@ threading.Thread(target=monitor, daemon=True).start()
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
