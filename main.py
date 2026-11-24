@@ -67,15 +67,15 @@ def get_stats():
     return None, None
 def monitor():
     last_total, last_consecutive = get_stats()
-    print(f"監視開始 - 総投稿数: {last_total}, 連続投稿日数: {last_consecutive}")
-
+    print(f"監視開始 - 総投稿数: {last_total}, 連続投稿日数: {last_consecutive}", flush=True)
     while True:
-        time.sleep(180) # 3分ごと
+        time.sleep(180)  # 3分ごと
         try:
             current_total, current_consecutive = get_stats()
             if current_total is None:
+                print("取得スキップ: current_total is None", flush=True)
                 continue
-                
+            print(f"監視チェック - total={current_total}, consecutive={current_consecutive}", flush=True)
             if current_total != last_total or current_consecutive != last_consecutive:
                 msg = (
                     f"【ONLY FIVE 更新通知】\n"
@@ -84,13 +84,12 @@ def monitor():
                     f"■ 連続投稿日数: {last_consecutive} → {current_consecutive}\n"
                     f"URL: {URL}"
                 )
-                print(msg)
+                print(msg, flush=True)
                 send_discord_notification(msg)
-                
                 last_total = current_total
                 last_consecutive = current_consecutive
         except Exception as e:
-            print(f"エラー発生: {e}")
+            print(f"エラー発生: {e}", flush=True)
 
 # バックグラウンドで監視処理を起動
 threading.Thread(target=monitor, daemon=True).start()
