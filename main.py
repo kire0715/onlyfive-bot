@@ -17,20 +17,25 @@ def home():
     return "Bot is running!"
 
 def send_discord_notification(message):
+    if not DISCORD_WEBHOOK_URL:
+        print("DISCORD_WEBHOOK_URL が未設定です", flush=True)
+        return
     payload = {"content": message}
     for attempt in range(3):
         try:
             res = requests.post(DISCORD_WEBHOOK_URL, json=payload, timeout=10)
-            print(f"Discord送信結果: status={res.status_code}, body={res.text[:200]}")
+            print(f"Discord送信結果: status={res.status_code}, body={res.text[:120]}", flush=True)
             if res.status_code in (200, 204):
                 return
             if res.status_code == 429:
-                retry_after = float(res.headers.get("Retry-After", 5))
-                time.sleep(min(retry_after, 30))
+                retry_after = float(res.headers.get("Retry-After", 15))
+                wait_sec = min(max(retry_after, 15.0), 60.0)
+                print(f"429 レート制限のため {wait_sec} 秒待機します", flush=True)
+                time.sleep(wait_sec)
                 continue
             return
         except Exception as e:
-            print(f"Discord送信エラー: {e}")
+            print(f"Discord送信エラー: {e}", flush=True)
             return
 
 def get_stats():
