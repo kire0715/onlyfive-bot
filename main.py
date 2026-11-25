@@ -19,7 +19,7 @@ def send_ntfy_notification(message: str) -> None:
 
     endpoint = f"https://ntfy.sh/{NTFY_TOPIC}"
     headers = {
-        "Title": "ONLY FIVE 更新通知",
+        "Title": "ONLY FIVE Alert",
         "Click": URL,
     }
     try:
