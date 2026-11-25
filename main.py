@@ -77,6 +77,12 @@ def get_stats():
     except Exception as e:
         print(f"データ取得エラー: {e}", flush=True)
         return None, None
+
+
+def monitor():
+    last_total, last_consecutive = get_stats()
+    print(f"監視開始 - 総投稿数: {last_total}, 連続投稿日数: {last_consecutive}", flush=True)
+
     while True:
         time.sleep(180)  # 3分ごと
         try:
