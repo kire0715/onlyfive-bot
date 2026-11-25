@@ -59,31 +59,24 @@ def get_stats():
         total_posts = None
         consecutive_days = None
 
-        for el in soup.find_all(["dt", "th", "p", "div", "span", "li"]):
-            label = el.get_text(" ", strip=True)
-            parent_text = el.parent.get_text(" ", strip=True) if el.parent else ""
-            next_text = el.find_next_sibling().get_text(" ", strip=True) if el.find_next_sibling() else ""
+        for box in soup.select(".rank-contents"):
+            title_el = box.select_one(".title")
+            count_el = box.select_one(".count")
+            if not title_el or not count_el:
+                continue
 
-            if total_posts is None and "総投稿数" in label:
-                total_posts = extract_number(next_text)
-                if total_posts is None:
-                    total_posts = extract_number(parent_text)
+            title_text = title_el.get_text(strip=True)
+            num = extract_number(count_el.get_text(strip=True))
 
-            if consecutive_days is None and "連続投稿日数" in label:
-                consecutive_days = extract_number(next_text)
-                if consecutive_days is None:
-                    consecutive_days = extract_number(parent_text)
+            if "総投稿数" in title_text and num is not None:
+                total_posts = num
+            elif "連続投稿日数" in title_text and num is not None:
+                consecutive_days = num
 
         return total_posts, consecutive_days
     except Exception as e:
         print(f"データ取得エラー: {e}", flush=True)
         return None, None
-
-
-def monitor() -> None:
-    last_total, last_consecutive = get_stats()
-    print(f"監視開始 - 総投稿数: {last_total}, 連続投稿日数: {last_consecutive}", flush=True)
-
     while True:
         time.sleep(180)  # 3分ごと
         try:
