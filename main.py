@@ -116,15 +116,6 @@ def index():
     return "OK", 200
 
 
-if not getattr(app, "_monitor_started", False):
-    app._monitor_started = True
-    threading.Thread(target=monitor, daemon=True).start()
-
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
-
 @app.route("/test-notify", methods=["GET"])
 def test_notify():
     msg = (
@@ -135,3 +126,13 @@ def test_notify():
     )
     send_ntfy_notification(msg)
     return "Sent test notification", 200
+
+
+if not getattr(app, "_monitor_started", False):
+    app._monitor_started = True
+    threading.Thread(target=monitor, daemon=True).start()
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
