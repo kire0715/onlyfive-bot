@@ -8,6 +8,7 @@ from flask import Flask
 # --- 設定 ---
 URL = "https://only-five.jp/creators/4635"
 DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL")
+NTFY_TOPIC = os.environ.get("NTFY_TOPIC")
 
 # クラウド上で常時稼働させるためのWebサーバー枠組み (Flask)
 app = Flask(__name__)
@@ -37,6 +38,23 @@ def send_discord_notification(message):
         except Exception as e:
             print(f"Discord送信エラー: {e}", flush=True)
             return
+
+def send_ntfy_notification(message):
+    if not NTFY_TOPIC:
+        print("NTFY_TOPIC が未設定です", flush=True)
+        return
+    url = f"https://ntfy.sh/{NTFY_TOPIC}"
+    headers = {"Title": "ONLY FIVE 更新通知"}
+    try:
+        res = requests.post(
+            url,
+            data=message.encode("utf-8"),
+            headers=headers,
+            timeout=10,
+        )
+        print(f"ntfy送信結果: status={res.status_code}, body={res.text[:120]}", flush=True)
+    except Exception as e:
+        print(f"ntfy送信エラー: {e}", flush=True)
 
 def get_stats():
     headers = {
