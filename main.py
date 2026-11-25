@@ -115,6 +115,7 @@ def monitor():
 def index():
     return "OK", 200
 
+
 if not getattr(app, "_monitor_started", False):
     app._monitor_started = True
     threading.Thread(target=monitor, daemon=True).start()
