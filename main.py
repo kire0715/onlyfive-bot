@@ -124,3 +124,14 @@ if not getattr(app, "_monitor_started", False):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
+
+@app.route("/test-notify", methods=["GET"])
+def test_notify():
+    msg = (
+        f"【テスト】石浜もも さんの投稿データ変化テストです！\n\n"
+        f"■ 総投稿数: 274 → 274\n"
+        f"■ 連続投稿日数: 1 → 1\n"
+        f"URL: {URL}"
+    )
+    send_ntfy_notification(msg)
+    return "Sent test notification", 200
