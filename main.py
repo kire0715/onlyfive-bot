@@ -115,19 +115,6 @@ def monitor():
 def index():
     return "OK", 200
 
-
-@app.route("/test-notify", methods=["GET"])
-def test_notify():
-    msg = (
-        f"【テスト】石浜もも さんの投稿データ変化テストです！\n\n"
-        f"■ 総投稿数: 274 → 274\n"
-        f"■ 連続投稿日数: 1 → 1\n"
-        f"URL: {URL}"
-    )
-    send_ntfy_notification(msg)
-    return "Sent test notification", 200
-
-
 if not getattr(app, "_monitor_started", False):
     app._monitor_started = True
     threading.Thread(target=monitor, daemon=True).start()
