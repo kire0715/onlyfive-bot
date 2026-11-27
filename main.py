@@ -9,29 +9,26 @@ from flask import Flask
 app = Flask(__name__)
 
 URL = "https://only-five.jp/creators/4635"
-NTFY_TOPIC = os.environ.get("NTFY_TOPIC")
+DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL")
 
 
-def send_ntfy_notification(message: str) -> None:
-    if not NTFY_TOPIC:
-        print("NTFY_TOPIC が未設定です", flush=True)
+def send_discord_notification(message: str) -> None:
+    if not DISCORD_WEBHOOK_URL:
+        print("DISCORD_WEBHOOK_URL が未設定です", flush=True)
         return
 
-    endpoint = f"https://ntfy.sh/{NTFY_TOPIC}"
-    headers = {
-        "Title": "ONLY FIVE Alert",
-        "Click": URL,
+    payload = {
+        "content": message,
     }
     try:
         res = requests.post(
-            endpoint,
-            data=message.encode("utf-8"),
-            headers=headers,
+            DISCORD_WEBHOOK_URL,
+            json=payload,
             timeout=10,
         )
-        print(f"ntfy送信結果: status={res.status_code}, body={res.text[:120]}", flush=True)
+        print(f"Discord送信結果: status={res.status_code}, body={res.text[:120]}", flush=True)
     except Exception as e:
-        print(f"ntfy送信エラー: {e}", flush=True)
+        print(f"Discord送信エラー: {e}", flush=True)
 
 
 def extract_number(text: str):
@@ -104,7 +101,7 @@ def monitor():
                     f"URL: {URL}"
                 )
                 print(msg, flush=True)
-                send_ntfy_notification(msg)
+                send_discord_notification(msg)
                 last_total = current_total
                 last_consecutive = current_consecutive
         except Exception as e:
